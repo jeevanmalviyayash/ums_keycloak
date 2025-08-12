@@ -176,7 +176,7 @@ const UserList = () => {
 
   //fetch User
   // useEffect(() => {
-  const fetchUsers = async (searchFilers = {}) => {
+ const fetchUsers = async (searchFilers = {}) => {
     try {
       const data = await getFilterdUser(token, searchFilers);
 
