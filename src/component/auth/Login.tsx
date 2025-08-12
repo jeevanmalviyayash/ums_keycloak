@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { RootState } from "../../app/store";
+import { RootState, AppDispatch } from "../../app/store";
 import AlertModal from "../../utils/AlertModal";
 import {
   closeModal,
@@ -21,19 +21,33 @@ import {
 import { loginValidation } from "../../utils/loginValidation";
 import { setIsAuthentication, setToken } from "../../features/token/tokenSlice";
 import ChangePasswordModal from "../ChangePassModal";
+import { jwtDecode } from "jwt-decode";
+import { getFilterdUser } from "../../features/register/registerAction";
+import { fetchRole } from "../../features/role/roleAction";
 
 const Login = () => {
-  const dispatch = useDispatch();
+  const dispatch: AppDispatch = useDispatch();
   const navigate = useNavigate();
   const { message, isOpen } = useSelector(
     (state: RootState) => state.alertModal
   );
   const [showPassword, setShowPassword] = useState(false);
+  const [userRoles, setUserRoles] = useState<Role[]>([]);
 
   const { fieldError, shouldRedirect } = useSelector(
     (state: RootState) => state.login
   );
 
+    const [filters, setFilters] = useState({
+    email: "",
+    firstName: "",
+    lastName: "",
+    address: "",
+    city: "",
+    company: "",
+    phoneNumber: "",
+    roleId: "",
+  });
   useEffect(() => {
     dispatch(clearFieldError());
   }, []);
@@ -72,6 +86,48 @@ const Login = () => {
       [name]: trimmedValue,
     });
   };
+  
+  const fetchUsers = async (token, searchFilers = {}) => {
+      try {
+        const data = await getFilterdUser(token, searchFilers);
+  
+      // Handle known error structure from Java backend
+      if (data?.status === "INTERNAL_SERVER_ERROR" || data?.message === "No users found") {
+        console.warn("Backend response:", data.message || "No users found.");
+        dispatch(setIsOpen(true));
+        dispatch(setMessage(data?.message));
+       // setUsers([]); // Show empty list
+        return;
+      }
+        return data;
+  
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    };
+    
+      const fetchAndFilterRoles = async (token) => {
+        try {
+          const response = await dispatch(fetchRole(token));
+          const result = response.payload;
+    
+          let filterDropDown = result;
+          const currentUserRole = role;
+    
+          if (currentUserRole === "SUPER_ADMIN") {
+            filterDropDown = result.filter(
+              (role: any) => role.name !== "SUPER_ADMIN"
+            );
+          } else if (currentUserRole === "ADMIN") {
+            filterDropDown = result.filter(
+              (role: any) => role.name !== "SUPER_ADMIN" && role.name !== "ADMIN"
+            );
+          }
+          setUserRoles(filterDropDown);
+        } catch (error) {
+          console.error("Error fetching roles: ", error);
+        }
+      };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,13 +153,28 @@ const Login = () => {
             dispatch(setToken(resultAction.payload.token));
           } else {
             console.log("Login Successfull", resultAction.payload);
-            dispatch(setUser(resultAction.payload));
+            const decoded = jwtDecode(resultAction.payload.access_token);
+            filters.email =loginForm.email;
+            const data = await fetchUsers(resultAction.payload.access_token, filters);
+          //  const roles = await fetchAndFilterRoles(resultAction.payload.access_token);
+          const rolesss = await dispatch(fetchRole(resultAction.payload.access_token));
+          const result = rolesss.payload;
+          // Extract roleId from the first user
+          const roleId = data[0]?.roleId;
+
+        // Find the matching role from the roles list
+           const matchedRole = result.find(role => role.id === roleId);
+           dispatch(setUser(data[0]));
+           dispatch(setRole(matchedRole.name));
+
             dispatch(setIsAuthentication(true));
-            const { token, role } = resultAction.payload;
-            dispatch(setRole(role));
+
+            //const { token, role } = resultAction.payload;
+            //dispatch(setRole(role));
+
             // store the token in redux
-            dispatch(setToken(resultAction.payload.token));
-            if (role === "ADMIN" || role === "SUPER_ADMIN") {
+            dispatch(setToken(resultAction.payload.access_token));
+            if (matchedRole === "ADMIN" || matchedRole === "SUPER_ADMIN") {
               navigate("/admin/users");
               //  return;
             }
