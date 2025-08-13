@@ -159,13 +159,8 @@ const Login = () => {
           //  const roles = await fetchAndFilterRoles(resultAction.payload.access_token);
           const rolesss = await dispatch(fetchRole(resultAction.payload.access_token));
           const result = rolesss.payload;
-          // Extract roleId from the first user
-          const roleId = data[0]?.roleId;
-
-        // Find the matching role from the roles list
-           const matchedRole = result.find(role => role.id === roleId);
            dispatch(setUser(data[0]));
-           dispatch(setRole(matchedRole.name));
+           dispatch(setRole(data[0].roleName));
 
             dispatch(setIsAuthentication(true));
 
