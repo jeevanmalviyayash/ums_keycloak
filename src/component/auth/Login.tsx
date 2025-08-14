@@ -169,7 +169,7 @@ const Login = () => {
 
             // store the token in redux
             dispatch(setToken(resultAction.payload.access_token));
-            if (matchedRole === "ADMIN" || matchedRole === "SUPER_ADMIN") {
+            if (data[0].roleName === "ADMIN" || data[0].roleName === "SUPER_ADMIN") {
               navigate("/admin/users");
               //  return;
             }

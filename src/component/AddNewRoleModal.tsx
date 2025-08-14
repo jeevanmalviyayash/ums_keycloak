@@ -121,7 +121,7 @@ const AddNewRoleModal = ({
               <div className="p-4 md:p-5">
                 <form className="space-y-4" action="#">
                   {/* Group */}
-                  {user?.role == "SUPER_ADMIN" && (
+                  {user?.roleName == "SUPER_ADMIN" && (
                     <div>
                       <label
                         htmlFor="role"
