@@ -62,7 +62,7 @@ const Dashboard = () => {
               </div>
               <div className="border border-white/30 rounded-lg p-4 backdrop-blur-md bg-white/10">
                 <span className="font-semibold block mb-1">Role:</span>
-                <p>{user?.role || "—"}</p>
+                <p>{user?.roleName || "—"}</p>
               </div>
               <div className="border border-white/30 rounded-lg p-4 backdrop-blur-md bg-white/10">
                 <span className="font-semibold block mb-1">Phone Number:</span>

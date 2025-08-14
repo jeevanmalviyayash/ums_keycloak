@@ -61,7 +61,7 @@ const Navbar: React.FC = () => {
                         </div>
 
                         <span className="pt-1  text-center text-sm font-semibold  ">
-                          {user.role}
+                          {user.roleName}
                         </span>
                       </Link>
                     </li>
@@ -147,7 +147,7 @@ const Navbar: React.FC = () => {
                   </Link>
                 </li>
                 {/* Group Management */}
-                {user?.role == "SUPER_ADMIN" && (
+                {user?.roleName == "SUPER_ADMIN" && (
                   <li className="mx-4  ">
                     <Link
                       to="/admin/addGroup"

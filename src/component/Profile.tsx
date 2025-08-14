@@ -226,7 +226,7 @@ if (["company", "address", "city"].includes(name) && value.startsWith(" ")) {
                 </span>
                 <span className="text-justify"> Role</span>
                 <span className="text-sm font-semibold text-gray-800 dark:text-gray-400 text-justify">
-                  : {user.role}
+                  : {user.roleName}
                 </span>
                 <span className="text-justify"> Phone Number</span>
                 <span className="text-sm text-gray-800 font-semibold dark:text-gray-400 text-justify">
