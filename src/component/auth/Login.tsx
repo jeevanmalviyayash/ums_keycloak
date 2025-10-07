@@ -195,10 +195,11 @@ const Login = () => {
           const payload = resultAction.payload;
           console.log("payload Rejected", payload);
 
-          if (payload && typeof payload === "object") {
+         // if (payload && typeof payload === "object") {
+          if (payload == "Login Failed") {
             dispatch(setIsOpen(true));
-            dispatch(setMessage(payload?.message as string));
-            dispatch(setError(payload?.message as string));
+            dispatch(setMessage(payload as string));
+            dispatch(setError(payload as string));
           }
           setTimeout(() => {
             dispatch(clearFieldError());
